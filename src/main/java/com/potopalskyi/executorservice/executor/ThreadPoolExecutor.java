@@ -43,12 +43,19 @@ public class ThreadPoolExecutor implements Executor {
     }
 
     public List<Runnable> shutdownNow() {
+        List<Runnable> list;
         isShoutDown = true;
-        for (Thread thread : threads) {
-            thread.interrupt();
+        synchronized (taskQueue) {
+            list = (List<Runnable>) taskQueue;
+            for (Thread thread : threads) {
+                thread.interrupt();
+            }
         }
-        System.exit(0);
-        return (List<Runnable>) taskQueue;
+        return list;
+    }
+
+    int getCountTask(){
+        return taskQueue.size();
     }
 
     class ThreadTask implements Runnable {
